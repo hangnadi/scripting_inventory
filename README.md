@@ -7,7 +7,7 @@ This tool scans a folder of images and generates an Excel workbook with:
 
 ## Features
 - Supports `.jpg`, `.jpeg`, `.png`, `.webp`
-- Adjustable thumbnail size (default 100px)
+- Adjustable thumbnail size (default 160px)
 - Optional recursive scanning of subfolders
 - Optional timestamp appended to output filename
 - Sensible column widths and frozen header row
