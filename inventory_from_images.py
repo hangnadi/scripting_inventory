@@ -34,7 +34,7 @@ def main():
         help="Path to the output Excel file (default: ./inventory_audit.xlsx)"
     )
     parser.add_argument(
-        "--thumb-size", type=int, default=100,
+        "--thumb-size", type=int, default=200,
         help="Thumbnail size in pixels for both width and height (default: 100)"
     )
     parser.add_argument(
@@ -56,6 +56,7 @@ def main():
     try:
         from openpyxl import Workbook
         from openpyxl.drawing.image import Image as XLImage
+        from openpyxl.worksheet.datavalidation import DataValidation
     except Exception as e:
         print("ERROR: openpyxl is not installed. Install with: pip install openpyxl", file=sys.stderr)
         raise
@@ -79,13 +80,37 @@ def main():
     ws = wb.active
     ws.title = "Inventory"
     # Headers
-    ws["A1"] = "Photo"
-    ws["B1"] = "Temporary Name"
-    ws.freeze_panes = "A2"
+    headers = ["Item Code", "Photo", "Item Name", "Category", "Stock Qty", "Unit", "Cost / Unit", "Supplier Link", "Purchase Date (Last)", "Notes"]
+    ws.append(headers)
+
+    # Create data validation object
+    dv = DataValidation(
+        type="list",
+        formula1='"Yarn,Beads,Hooks,Glue,Fabric,Others"',
+        allow_blank=True
+    )
+    dv.error = 'Select from the list.'
+    dv.errorTitle = 'Invalid Category'
+    dv.prompt = 'Choose a category from the list'
+    dv.promptTitle = 'Category Selection'
+    
+    # Apply to Column D starting from row 2 to row 500
+    dv.add("D2:D500")
+
+    # Add data validation to the worksheet
+    ws.add_data_validation(dv)
 
     # Set column widths (approx); row heights set per-image
     ws.column_dimensions["A"].width = 18  # image column
     ws.column_dimensions["B"].width = 40  # name column
+    ws.column_dimensions["C"].width = 40  # image column
+    ws.column_dimensions["D"].width = 18  # name column
+    ws.column_dimensions["E"].width = 18  # image column
+    ws.column_dimensions["F"].width = 18  # name column
+    ws.column_dimensions["G"].width = 18  # image column
+    ws.column_dimensions["H"].width = 18  # name column
+    ws.column_dimensions["I"].width = 18  # image column
+    ws.column_dimensions["J"].width = 18  # name column
 
     # Thumbnail temp cache in-memory (BytesIO) to avoid filesystem writes
     # openpyxl accepts PIL images directly, but to be robust across versions,
@@ -106,17 +131,17 @@ def main():
                 # Create openpyxl image from buffer
                 xl_img = XLImage(buf)
                 # Slight padding in cell
-                ws.row_dimensions[row].height = max(80, args.thumb_size * 0.75)  # Excel row height is in points
+                ws.row_dimensions[row].height = max(160, args.thumb_size * 0.75)  # Excel row height is in points
                 # Add image to cell A{row}
-                cell_addr = f"A{row}"
+                cell_addr = f"B{row}"
                 ws.add_image(xl_img, cell_addr)
 
                 # Temporary name from filename (no extension)
-                ws[f"B{row}"] = fp.stem
+                ws[f"C{row}"] = fp.stem
                 row += 1
         except Exception as e:
             # Log error but continue
-            ws[f"B{row}"] = f"[ERROR reading image] {fp.name}"
+            ws[f"C{row}"] = f"[ERROR reading image] {fp.name}"
             row += 1
             continue
 
