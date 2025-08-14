@@ -36,7 +36,7 @@ python inventory_from_images.py
 ## Arguments
 - `--input` (or `-i`): Path to the folder containing images (default: `./images`)
 - `--output` (or `-o`): Path to the output Excel file (default: `./inventory_audit.xlsx`)
-- `--thumb-size`: Thumbnail size in pixels for width & height (default: `100`)
+- `--thumb-size`: Thumbnail size in pixels for width & height (default: `160`)
 - `--timestamped`: Append a timestamp to the output file name
 - `--recursive`: Search images inside subfolders too
 
